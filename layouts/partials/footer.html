@@ -1,0 +1,16 @@
+</main>
+
+<footer>
+  <p>&copy;{{ dateFormat "2006" now }} {{ .Site.Title }}</p>
+  {{ with .Site.Params.contact }}
+  <div class="link-section">
+    {{ range . }}
+    <a class="contact-link" href={{ .link }}><img class="contact-logo" src={{ .icon }} alt={{ .name }}></a>
+    {{ end }}
+  </div>
+  {{ end }}
+
+</footer>
+</body>
+
+</html>

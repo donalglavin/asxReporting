@@ -1,3 +1,44 @@
 baseURL: https://example.org/
-languageCode: en-us
-title: My New Hugo Site
+languageCode: en-au
+defaultContentLanguage: en-au
+title: "ASX ETF Analysis"
+pagination.pagerSize: 5
+
+markup: 
+  goldmark:
+    renderer: 
+      unsafe: true
+
+menu: 
+  main:
+    - name: Overview
+      identifier: overview
+      url: /overview
+      weight: 10
+
+    - name: Listings
+      identifier: projects
+      url: /projects
+      weight: 20
+
+    - name: Analysis
+      identifier: about
+      url: /about
+      weight: 30
+
+    - name: Contact
+      identifier: contact
+      url: /contact
+      weight: 40
+
+archetypeDir: archetypes
+assetDir: assets
+layoutDir: layouts
+contentDir: content
+dataDir: data
+
+noBuildLock: true
+
+minify:
+  disableXML: true
+  minifyOutput: true
