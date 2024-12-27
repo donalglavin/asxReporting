@@ -1,7 +1,8 @@
-{{ with $file := .Get 0 }}
+{{ $file := .Get 0 }}
+{{ $id := .Get 1 }}
 {{ with resources.Get $file }}
 {{ with . | transform.Unmarshal }}
-<table>
+<table id="{{ $id }}">
   <thead>
     <tr>
       {{ range index . 0 }}
@@ -20,10 +21,4 @@
   </tbody>
 </table>
 {{ end }}
-{{ else }}
-{{ errorf "The %q shortcode was unable to find %s. See %s" $.Name $file $.Position }}
-{{ end }}
-{{ else }}
-{{ errorf "The %q shortcode requires one positional argument," .Name }}
-{{ errorf "the path to the CSV file relative to the assets directory. See %s" .Position }}
 {{ end }}

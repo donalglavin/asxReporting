@@ -1,0 +1,30 @@
+[project]
+name = "asx-pages"
+version = "0.1"
+authors = [
+{name = "Donal Glavin"}
+]
+requires-python = ">3.13"
+classifiers = [
+    "Programming Language :: Python :: Implementation :: CPython",
+    "Programming Language :: Python :: Implementation :: PyPy",
+]
+dependencies = [
+    "requests",
+    "numpy",
+    "pandas", 
+    "ipywidgets",
+    "panel",
+    "pandas-stubs",
+    "matplotlib",
+]
+
+[tool.pyright]
+exclude = ["**/node_modules",
+    "**/__pycache__",
+]
+defineConstant = { DEBUG = true }
+reportMissingImports = "error"
+reportMissingTypeStubs = true
+reportOptionalSubscript = true
+reportOptionalMemberAccess = true

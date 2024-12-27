@@ -6,4 +6,5 @@ title: 'Market Overview'
 
 # ASX Company Directory
 The current list of all companies listed on the Australian Stock Exchange can be seen below.
-{{< csv-to-table "scripts/data/company_directory.csv" >}}
+<!--{{< csv-to-table "scripts/data/companies.csv" "asx" >}}-->
+{{< render-html "scripts/data/result.html" >}}

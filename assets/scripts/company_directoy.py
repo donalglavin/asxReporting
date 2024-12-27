@@ -1,6 +1,19 @@
 import requests
 import pandas as pd
 
+colors = [
+    "#263238",
+    "#37474f",
+    "#455a64",
+    "#546e7a",
+    "#607d8b",
+    "#78909c",
+    "#90a4ae",
+    "#b0bec5",
+    "#cfd8dc",
+    "#eceff1",
+]
+
 
 def run():
     url = "https://asx.api.markitdigital.com/asx-research/1.0/companies/directory"
@@ -44,7 +57,7 @@ def run():
         # Format Data Appropriately before returning.
         res = pd.json_normalize(listings).convert_dtypes()
         res["dateListed"] = pd.to_datetime(res["dateListed"], format="%Y-%m-%d")
-        res["marketCap"] = pd.to_numeric(res["marketCap"], errors="coerce").astype(
+        res["marketCap"] = (pd.to_numeric(res["marketCap"], errors="coerce")).astype(
             "object"
         )
         return res
@@ -65,20 +78,66 @@ def format(x):
 
 if __name__ == "__main__":
     out = run()
+
+    # Subset and rename columns.
     report = out[
-        ["symbol", "displayName", "industry", "marketCap", "priceChangeFiveDayPercent"]
-    ].sort_values(by="marketCap", ascending=False)
+        [
+            "symbol",
+            "displayName",
+            "industry",
+            "priceChangeFiveDayPercent",
+            "marketCap",
+        ]
+    ].rename(
+        columns={
+            "symbol": "Sym",
+            "displayName": "Name",
+            "industry": "Industry",
+            "priceChangeFiveDayPercent": "%5d",
+            "marketCap": "M Cap",
+        }
+    )
 
-    report.loc[:, "priceChangeFiveDayPercent"] = report[
-        "priceChangeFiveDayPercent"
-    ].round(2)
-    report.loc[:, "marketCap"] = report["marketCap"].apply(format)
+    # # Format market capital values to for humans.
+    # report.loc[:, "M Cap"] = report["M Cap"].apply(format)
 
-    report.columns = [
-        "Sym",
-        "Name",
-        "Industry",
-        "M Cap",
-        "%5d",
-    ]
-    report.to_csv("./data/company_directory.csv", index=False)
+    # # Export the result to a html teble.
+    report.style.format(precision=1, thousands=",", decimal=".").set_table_styles(
+        [
+            {
+                "selector": "tr:nth-child(even)",
+                "props": f"background-color: {colors[-1]}",
+            },
+            {
+                "selector": "tr:hover",
+                "props": f"background-color: {colors[-3]}; ",
+            },
+            {
+                "selector": "td:hover",
+                "props": f"background-color: {colors[-6]}; color:{colors[-1]};  padding: 2px;",
+            },
+            {
+                "selector": "th",
+                "props": f"background-color: {colors[0]}; color:{colors[-1]};",
+            },
+            {
+                "selector": "th",
+                "props": f"background-color: {colors[0]}; color:{colors[-1]};",
+            },
+        ]
+    ).hide().bar(
+        vmin=report["%5d"].min(),
+        vmax=report["%5d"].max(),
+        cmap="RdBu",
+    ).to_html(
+        "data/result.html", table_id="company_directory", index=False, index_names=False
+    )
+
+# .bar(
+#         align=0,
+#         vmin=report["%5d"].min(),
+#         vmax=report["%5d"].max(),
+#         cmap="RdBu",
+#         height=100,
+#         width=0,
+#     )
