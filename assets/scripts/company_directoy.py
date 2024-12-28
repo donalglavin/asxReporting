@@ -1,5 +1,6 @@
 import requests
 import pandas as pd
+import plotly.express as px
 
 colors = [
     "#263238",
@@ -79,7 +80,7 @@ def format(x):
 if __name__ == "__main__":
     out = run()
 
-    # Subset and rename columns.
+    # Subset and rename columns for interpretation.
     report = out[
         [
             "symbol",
@@ -93,20 +94,36 @@ if __name__ == "__main__":
             "symbol": "Sym",
             "displayName": "Name",
             "industry": "Industry",
-            "priceChangeFiveDayPercent": "%5d",
-            "marketCap": "M Cap",
+            "priceChangeFiveDayPercent": "&Delta; 5d%",
+            "marketCap": "MCap ($m)",
         }
     )
 
-    # # Format market capital values to for humans.
-    # report.loc[:, "M Cap"] = report["M Cap"].apply(format)
+    # Convert Market capital to millions.
+    report.loc[:, report.columns[4]] = report[report.columns[4]].div(1e6)
 
-    # # Export the result to a html teble.
-    report.style.format(precision=1, thousands=",", decimal=".").set_table_styles(
+    fig = px.sunburst(report, path=["Industry", "Name"], values="MCap ($m)")
+    fig.update_traces(
+        hovertemplate="</br>%{label}</br>$%{value:,.1f}m (%{percentEntry:.2%} share of Total) </br>%{parent} - \
+        %{percentParent:.2%}"
+    )
+    fig.write_html("data/overview.html")
+    fig.write_json("data/overview.json")
+
+    # mcap_dist_by_ind = report.groupby(report.columns[2]).sum()
+
+    # ASX Company Directory Table.
+    report.style.format(
+        "{:.1f}",
+        na_rep="",
+        subset=[report.columns[3], report.columns[4]],
+        thousands=",",
+        decimal=".",
+    ).set_table_styles(
         [
             {
                 "selector": "tr:nth-child(even)",
-                "props": f"background-color: {colors[-1]}",
+                "props": f"background-color: {colors[-2]}",
             },
             {
                 "selector": "tr:hover",
@@ -114,21 +131,35 @@ if __name__ == "__main__":
             },
             {
                 "selector": "td:hover",
-                "props": f"background-color: {colors[-6]}; color:{colors[-1]};  padding: 2px;",
+                "props": f"background-color: {colors[-6]}; color:{colors[-1]};",
+            },
+            {
+                "selector": "td",
+                "props": "padding: 2px 5px;",
             },
             {
                 "selector": "th",
-                "props": f"background-color: {colors[0]}; color:{colors[-1]};",
+                "props": f"background-color: {colors[0]}; color:{colors[-1]}; text-align: left;",
+            },
+            {
+                "selector": "td.col3",
+                "props": "text-align: center;",
+            },
+            {
+                "selector": "td.col4",
+                "props": "text-align: right;",
             },
             {
                 "selector": "th",
-                "props": f"background-color: {colors[0]}; color:{colors[-1]};",
+                "props": f"background-color: {colors[0]}; color:{colors[-1]}; padding: 2px 5px;",
             },
         ]
     ).hide().bar(
-        vmin=report["%5d"].min(),
-        vmax=report["%5d"].max(),
+        vmin=report[report.columns[3]].min(),
+        vmax=report[report.columns[3]].max(),
         cmap="RdBu",
+        height=100,
+        width=100,
     ).to_html(
         "data/result.html", table_id="company_directory", index=False, index_names=False
     )

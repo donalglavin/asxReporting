@@ -14,7 +14,7 @@ dependencies = [
     "numpy",
     "pandas", 
     "ipywidgets",
-    "panel",
+    "plotly",
     "pandas-stubs",
     "matplotlib",
 ]
