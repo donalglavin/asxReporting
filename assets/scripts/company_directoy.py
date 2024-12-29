@@ -16,7 +16,11 @@ colors = [
 ]
 
 
-def run():
+def asx_listings():
+    """
+    Function queries the ASX directly for the current list of all listed companies. This query then returns a json
+    object which is converted into a pandas dataframe and returned by the function.
+    """
     url = "https://asx.api.markitdigital.com/asx-research/1.0/companies/directory"
 
     querystring = {
@@ -77,8 +81,9 @@ def format(x):
         return "${:.0f}B".format(x / 1e9)
 
 
+# Main function to generate report files and data.
 if __name__ == "__main__":
-    out = run()
+    out = asx_listings()
 
     # Subset and rename columns for interpretation.
     report = out[
@@ -102,15 +107,14 @@ if __name__ == "__main__":
     # Convert Market capital to millions.
     report.loc[:, report.columns[4]] = report[report.columns[4]].div(1e6)
 
+    # Create the overview graphic for the ASX lsitings and market share.
     fig = px.sunburst(report, path=["Industry", "Name"], values="MCap ($m)")
     fig.update_traces(
         hovertemplate="</br>%{label}</br>$%{value:,.1f}m (%{percentEntry:.2%} share of Total) </br>%{parent} - \
         %{percentParent:.2%}"
     )
-    fig.write_html("data/overview.html")
+    # Return the plotly json data to be used by hugo.
     fig.write_json("data/overview.json")
-
-    # mcap_dist_by_ind = report.groupby(report.columns[2]).sum()
 
     # ASX Company Directory Table.
     report.style.format(
@@ -164,11 +168,5 @@ if __name__ == "__main__":
         "data/result.html", table_id="company_directory", index=False, index_names=False
     )
 
-# .bar(
-#         align=0,
-#         vmin=report["%5d"].min(),
-#         vmax=report["%5d"].max(),
-#         cmap="RdBu",
-#         height=100,
-#         width=0,
-#     )
+    # Return json object of stock codes and listing dates.
+    out[["symbol", "dateListed"]].to_json("data/syms.json")
