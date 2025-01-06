@@ -1,4 +1,4 @@
-# A script to retrieve all of the company financials for a given ASX company.
+# A script to retrieve all of the company financials and price history for a given ASX company.
 import pandas as pd
 import yfinance as yf  # type: ignore
 
@@ -20,8 +20,11 @@ if __name__ == "__main__":
     print(out.head())
 
     for ind, row in out.iterrows():
+        # Define the symbol and the associated yfinance objects.
         sym = row["symbol"]
         tic = yf.Ticker(sym)
+
+        # Extract Histories.
         hist = pd.DataFrame(tic.history(period="max"))
         hist.to_json(f"data/histories/{sym}_hist.json")
 
