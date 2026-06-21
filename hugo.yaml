@@ -1,15 +1,15 @@
-baseURL: https://example.org/
+baseURL: https://donalglavin.github.io/asxReporting
 languageCode: en-au
 defaultContentLanguage: en-au
 title: "ASX ETF Analysis"
 pagination.pagerSize: 5
 
-markup: 
+markup:
   goldmark:
-    renderer: 
+    renderer:
       unsafe: true
 
-menu: 
+menu:
   main:
     - name: Overview
       identifier: overview
