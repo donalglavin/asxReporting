@@ -114,7 +114,7 @@ if __name__ == "__main__":
         %{percentParent:.2%}"
     )
     # Return the plotly json data to be used by hugo.
-    fig.write_json("data/overview.json")
+    fig.write_json("./data/overview.json")
 
     # ASX Company Directory Table.
     report.style.format(
@@ -165,8 +165,11 @@ if __name__ == "__main__":
         height=100,
         width=100,
     ).to_html(
-        "data/result.html", table_id="company_directory", index=False, index_names=False
+        "./data/result.html",
+        table_id="company_directory",
+        index=False,
+        index_names=False,
     )
 
     # Return json object of stock codes and listing dates.
-    out[["symbol", "dateListed"]].to_json("data/syms.json")
+    out[["symbol", "dateListed"]].to_json("./data/syms.json")
